@@ -4,11 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Subwoofer Simulator</title>
+    <meta name="description" content="Симулятор сабвуфера с тюнингом и звуковыми эффектами." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet" />
     <style>
-        /* ===== Все стили (без изменений) ===== */
+        /* ===== Все стили (без форума) ===== */
         :root {
             --red-accent: #e63946;
             --red-glow: rgba(230, 57, 70, 0.3);
@@ -164,11 +165,16 @@
         .btn-download:hover { background:#242424; border-color:#c62835; transform:translateY(-4px) scale(1.02); box-shadow:0 12px 40px rgba(230,57,70,0.25); }
         .btn-telegram { background:#1e1e1e; border-color:var(--gray-border); box-shadow:0 4px 24px rgba(0,0,0,0.3); }
         .btn-telegram:hover { background:#2c2c2c; border-color:#5a5a5a; transform:translateY(-4px) scale(1.02); box-shadow:0 12px 44px rgba(0,0,0,0.6); }
-        /* ===== Форум ===== */
-        .forum-container { max-width:1000px; margin:0 auto; }
-        .forum-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:2rem; }
-        .forum-header h1 { font-size:2.8rem; font-weight:700; background:linear-gradient(135deg,#fff 30%,#b0b0b0 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .forum-actions { display:flex; gap:1rem; flex-wrap:wrap; }
+        /* ===== Профиль ===== */
+        .profile-container { max-width:700px; margin:0 auto; background:rgba(255,255,255,0.02); border:1px solid var(--gray-border); border-radius:20px; padding:2rem; }
+        .profile-avatar { width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid var(--gray-border); background:#1a1a1a; display:block; margin-bottom:1rem; }
+        .profile-avatar-default { background:#1a1a1a; display:flex; align-items:center; justify-content:center; font-size:4rem; color:var(--text-muted); }
+        .profile-field { margin-bottom:1.5rem; }
+        .profile-field label { display:block; color:var(--text-secondary); font-size:0.9rem; margin-bottom:0.3rem; }
+        .profile-field .value { color:var(--text-primary); font-size:1.1rem; padding:0.3rem 0; }
+        .profile-field input[type="file"] { display:block; margin-top:0.3rem; }
+        .profile-actions { display:flex; gap:1rem; flex-wrap:wrap; margin-top:1.5rem; border-top:1px solid var(--gray-border); padding-top:1.5rem; }
+        .profile-actions .btn-action { flex:1 1 auto; min-width:120px; text-align:center; }
         .btn-action {
             background:rgba(255,255,255,0.04);
             border:1px solid var(--gray-border);
@@ -186,158 +192,27 @@
         .btn-action.primary:hover { background:#c62835; border-color:#c62835; }
         .btn-action.danger { border-color:#c62835; color:#c62835; }
         .btn-action.danger:hover { background:#c62835; color:#fff; }
-        .btn-action.small { font-size:0.75rem; padding:0.2rem 0.8rem; }
-        .category-list { display:flex; flex-direction:column; gap:1.5rem; }
-        .category-card { background:rgba(255,255,255,0.02); border:1px solid var(--gray-border); border-radius:16px; padding:1.2rem 1.8rem; transition:all 0.3s; }
-        .category-card:hover { border-color:rgba(230,57,70,0.3); }
-        .category-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
-        .category-title { font-size:1.6rem; font-weight:700; color:var(--text-primary); margin-bottom:0.3rem; }
-        .category-meta { color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem; }
-        .topic-list { display:flex; flex-direction:column; gap:0.8rem; margin:0.5rem 0 0.8rem 0; }
-        .topic-item { display:flex; justify-content:space-between; align-items:center; padding:0.5rem 0.8rem; background:rgba(255,255,255,0.02); border-radius:8px; transition:background 0.2s; cursor:pointer; }
-        .topic-item:hover { background:rgba(255,255,255,0.06); }
-        .topic-name { color:var(--text-secondary); font-weight:500; }
-        .topic-author { color:var(--text-muted); font-size:0.8rem; }
-        .topic-delete, .topic-edit { color:var(--text-muted); background:transparent; border:none; cursor:pointer; font-size:0.9rem; padding:0.2rem 0.5rem; border-radius:6px; transition:all 0.2s; }
-        .topic-delete:hover { color:var(--red-accent); background:rgba(230,57,70,0.1); }
-        .topic-edit:hover { color:#f0f0f0; background:rgba(255,255,255,0.1); }
-        .no-topics { color:var(--text-muted); font-size:0.9rem; padding:0.5rem 0; }
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); z-index:200; justify-content:center; align-items:center; }
         .modal.open { display:flex; }
         .modal-content { background:#1a1a1a; border:1px solid var(--gray-border); border-radius:20px; padding:2rem; max-width:500px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.8); }
         .modal-content h2 { font-size:1.8rem; margin-bottom:1.5rem; background:linear-gradient(135deg,#fff 30%,#b0b0b0 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
         .modal-content label { display:block; color:var(--text-secondary); margin-bottom:0.3rem; font-size:0.9rem; }
-        .modal-content input, .modal-content textarea, .modal-content select { width:100%; padding:0.7rem 1rem; margin-bottom:1.2rem; background:#0b0b0b; border:1px solid var(--gray-border); border-radius:10px; color:#fff; font-family:inherit; font-size:1rem; outline:none; transition:border 0.3s; }
-        .modal-content input:focus, .modal-content textarea:focus, .modal-content select:focus { border-color:var(--red-accent); }
-        .modal-content textarea { min-height:80px; resize:vertical; }
+        .modal-content input { width:100%; padding:0.7rem 1rem; margin-bottom:1.2rem; background:#0b0b0b; border:1px solid var(--gray-border); border-radius:10px; color:#fff; font-family:inherit; font-size:1rem; outline:none; transition:border 0.3s; }
+        .modal-content input:focus { border-color:var(--red-accent); }
         .modal-actions { display:flex; gap:1rem; justify-content:flex-end; margin-top:0.5rem; }
         .modal-actions .btn-action { padding:0.6rem 2rem; }
         .modal-actions .btn-action.cancel { background:transparent; border-color:var(--gray-border); }
         .modal-actions .btn-action.cancel:hover { border-color:#555; }
         .error-msg { color:var(--red-accent); font-size:0.9rem; margin-top:-0.5rem; margin-bottom:0.5rem; }
-        .comment-section { margin-top:1.5rem; border-top:1px solid var(--gray-border); padding-top:1rem; }
-        .comment {
-            padding:0.8rem 0;
-            border-bottom:1px solid rgba(255,255,255,0.04);
-            position:relative;
-            transition: background 0.2s;
+        .footer {
+            position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+            text-align:center; color:var(--text-muted); font-size:0.85rem; letter-spacing:0.03em;
+            z-index:5; width:90%; max-width:800px; padding-top:1.2rem;
+            border-top:1px solid var(--gray-border);
+            background:rgba(11,11,11,0.5); backdrop-filter:blur(4px); border-radius:12px; padding:1.2rem 2rem;
         }
-        .comment.pinned {
-            background: rgba(230,57,70,0.05);
-            border-left: 3px solid var(--red-accent);
-            padding-left: 0.8rem;
-            border-radius: 0 8px 8px 0;
-        }
-        .comment-header { display:flex; align-items:center; flex-wrap:wrap; gap:0.5rem; }
-        .comment-author { font-weight:600; color:var(--text-primary); }
-        .comment-rank { color:var(--red-accent); font-size:0.8rem; }
-        .comment-date { color:var(--text-muted); font-size:0.75rem; }
-        .comment-text {
-            color: var(--text-secondary);
-            margin-top: 0.2rem;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        .comment-text strong { color: var(--text-primary); font-weight: 700; }
-        .comment-text em { font-style: italic; color: var(--text-secondary); }
-        .comment-text span[style*="color"] { font-weight: 500; }
-        .comment-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.3rem;
-            flex-wrap: wrap;
-        }
-        .comment-actions button {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            cursor: pointer;
-            padding: 0.1rem 0.5rem;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-        .comment-actions button:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
-        .comment-actions .reply-btn:hover { color: var(--red-accent); }
-        .comment-actions .delete-btn:hover { color: var(--red-accent); background: rgba(230,57,70,0.1); }
-        .comment-actions .pin-btn:hover { color: #ffd700; background: rgba(255,215,0,0.1); }
-        .pinned-badge {
-            color: #ffd700;
-            font-size: 0.85rem;
-            margin-left: 0.5rem;
-            background: rgba(255,215,0,0.1);
-            padding: 0.1rem 0.6rem;
-            border-radius: 12px;
-        }
-        .comment-form {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            margin-top: 1rem;
-        }
-        .comment-form .toolbar {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .comment-form .toolbar button {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--gray-border);
-            color: var(--text-secondary);
-            padding: 0.2rem 0.8rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .comment-form .toolbar button:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: var(--red-accent);
-            color: #fff;
-        }
-        .comment-form .toolbar select {
-            background: #0b0b0b;
-            border: 1px solid var(--gray-border);
-            color: #fff;
-            padding: 0.2rem 0.5rem;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 0.85rem;
-            outline: none;
-            cursor: pointer;
-        }
-        .comment-form .toolbar select:focus { border-color: var(--red-accent); }
-        .comment-form .input-row {
-            display: flex;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-        }
-        .comment-form .input-row input {
-            flex: 1 1 200px;
-            padding: 0.6rem 1rem;
-            background: #0b0b0b;
-            border: 1px solid var(--gray-border);
-            border-radius: 30px;
-            color: #fff;
-            font-family: inherit;
-            outline: none;
-        }
-        .comment-form .input-row input:focus { border-color: var(--red-accent); }
-        .comment-form .input-row button { padding: 0.6rem 1.5rem; }
-        /* ===== Профиль ===== */
-        .profile-container { max-width:700px; margin:0 auto; background:rgba(255,255,255,0.02); border:1px solid var(--gray-border); border-radius:20px; padding:2rem; }
-        .profile-avatar { width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid var(--gray-border); background:#1a1a1a; display:block; margin-bottom:1rem; }
-        .profile-avatar-default { background:#1a1a1a; display:flex; align-items:center; justify-content:center; font-size:4rem; color:var(--text-muted); }
-        .profile-field { margin-bottom:1.5rem; }
-        .profile-field label { display:block; color:var(--text-secondary); font-size:0.9rem; margin-bottom:0.3rem; }
-        .profile-field .value { color:var(--text-primary); font-size:1.1rem; padding:0.3rem 0; }
-        .profile-field input[type="file"] { display:block; margin-top:0.3rem; }
-        .profile-actions { display:flex; gap:1rem; flex-wrap:wrap; margin-top:1.5rem; border-top:1px solid var(--gray-border); padding-top:1.5rem; }
-        .profile-actions .btn-action { flex:1 1 auto; min-width:120px; text-align:center; }
-
+        .footer a { color:var(--red-accent); text-decoration:none; font-weight:500; transition:all 0.3s; border-bottom:1px solid transparent; padding-bottom:1px; }
+        .footer a:hover { color:#ff6b7a; border-bottom-color:var(--red-accent); }
         @media (max-width:900px) {
             .install-grid { flex-wrap:wrap; }
             .content-left, .content-right { flex:1 1 100%; max-width:100%; padding-right:0; }
@@ -345,13 +220,11 @@
             .header { padding:0 1rem; }
             .logo-img { height:34px; }
             .nav-tab { font-size:0.85rem; padding:0.4rem 0.8rem; }
-            .forum-header h1 { font-size:2.2rem; }
             .profile-container { padding:1.2rem; }
         }
         @media (max-width:500px) {
             .header-left { gap:0.5rem; }
             .nav-tab { font-size:0.7rem; padding:0.3rem 0.6rem; }
-            .forum-header h1 { font-size:1.6rem; }
             .modal-content { padding:1.2rem; }
             .profile-avatar { width:80px; height:80px; }
         }
@@ -369,7 +242,6 @@
             <a href="#" class="logo-link"><img src="main/logo.png" alt="Subwoofer Simulator" class="logo-img"></a>
             <nav class="nav-tabs" id="nav-tabs">
                 <button class="nav-tab active" data-tab="install">Установка</button>
-                <button class="nav-tab" data-tab="forum">Форум</button>
             </nav>
         </div>
         <div class="header-right" id="auth-section"></div>
@@ -411,17 +283,6 @@
             </div>
         </div>
 
-        <!-- Форум -->
-        <div id="forum-content" class="content-section">
-            <div class="forum-container">
-                <div class="forum-header">
-                    <h1>Форум</h1>
-                    <div class="forum-actions" id="forum-actions"></div>
-                </div>
-                <div id="forum-body"></div>
-            </div>
-        </div>
-
         <!-- Профиль -->
         <div id="profile-content" class="content-section">
             <div class="profile-container" id="profile-container"></div>
@@ -450,13 +311,9 @@
             } else {
                 data = {
                     users: [],
-                    categories: [],
-                    topics: [],
-                    comments: [],
-                    nextId: { users: 1, categories: 1, topics: 1, comments: 1 }
+                    nextId: { users: 1 }
                 };
             }
-
             // Создаём аккаунт Developer, если его нет
             const dev = data.users.find(u => u.login === 'Developer');
             if (!dev) {
@@ -469,21 +326,6 @@
                     avatar: '',
                     createdAt: Date.now()
                 });
-                // Если нет категорий, создаём начальные
-                if (data.categories.length === 0) {
-                    data.categories.push(
-                        { id: data.nextId.categories++, name: 'Общие вопросы', createdBy: data.users[0].id },
-                        { id: data.nextId.categories++, name: 'Техническая поддержка', createdBy: data.users[0].id }
-                    );
-                    data.topics.push(
-                        { id: data.nextId.topics++, categoryId: data.categories[0].id, title: 'Добро пожаловать!', author: data.users[0].id, createdAt: Date.now() - 3600000 },
-                        { id: data.nextId.topics++, categoryId: data.categories[1].id, title: 'Как установить игру?', author: data.users[0].id, createdAt: Date.now() - 7200000 }
-                    );
-                    data.comments.push(
-                        { id: data.nextId.comments++, topicId: data.topics[0].id, author: data.users[0].id, text: 'Приветствуем всех на форуме!', createdAt: Date.now() - 1800000, pinned: false },
-                        { id: data.nextId.comments++, topicId: data.topics[1].id, author: data.users[0].id, text: 'Инструкция по установке в разделе "Установка" на сайте.', createdAt: Date.now() - 300000, pinned: false }
-                    );
-                }
                 saveDB(data);
             }
             return data;
@@ -499,11 +341,6 @@
         // ============================================================
         //  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
         // ============================================================
-        function generateId(type) {
-            db.nextId[type] = (db.nextId[type] || 0) + 1;
-            return db.nextId[type];
-        }
-
         function findUser(login, password) {
             return db.users.find(u => u.login === login && u.password === password);
         }
@@ -512,398 +349,13 @@
             return db.users.find(u => u.id === id);
         }
 
-        function getCategory(id) {
-            return db.categories.find(c => c.id === id);
-        }
-
-        function getTopicsByCategory(categoryId) {
-            return db.topics.filter(t => t.categoryId === categoryId).sort((a,b) => b.createdAt - a.createdAt);
-        }
-
-        function getCommentsByTopic(topicId) {
-            return db.comments.filter(c => c.topicId === topicId);
-        }
-
-        function getTopic(id) {
-            return db.topics.find(t => t.id === id);
-        }
-
-        function getAuthorName(authorId) {
-            const user = getUserById(authorId);
-            return user ? user.username : 'Неизвестный';
-        }
-
-        function getAuthorRank(authorId) {
-            const user = getUserById(authorId);
-            return user ? user.rank : 'Гость';
-        }
-
         function isAdmin(user) {
             return user && user.rank === 'ГА Форума';
         }
 
         // ============================================================
-        //  ФУНКЦИЯ ФОРМАТИРОВАНИЯ ТЕКСТА
+        //  МОДАЛЬНЫЕ ОКНА
         // ============================================================
-        function formatCommentText(text) {
-            let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            html = html.replace(/\[color=([^\]]+)\](.*?)\[\/color\]/g, '<span style="color:$1;">$2</span>');
-            return html;
-        }
-
-        // ============================================================
-        //  РЕНДЕР ФОРУМА (без изменений)
-        // ============================================================
-        function renderForum() {
-            const body = document.getElementById('forum-body');
-            const actions = document.getElementById('forum-actions');
-
-            let actionsHtml = '';
-            if (currentUser) {
-                if (isAdmin(currentUser)) {
-                    actionsHtml += `<button class="btn-action primary" data-action="add-category">+ Категория</button>`;
-                    actionsHtml += `<button class="btn-action primary" data-action="add-topic">+ Тема</button>`;
-                }
-            } else {
-                actionsHtml += `<button class="btn-action" data-action="login">Войти</button>
-                                <button class="btn-action" data-action="register">Регистрация</button>`;
-            }
-            actions.innerHTML = actionsHtml;
-
-            document.querySelectorAll('[data-action]').forEach(el => {
-                el.removeEventListener('click', handleAction);
-                el.addEventListener('click', handleAction);
-            });
-
-            let html = '<div class="category-list">';
-            if (db.categories.length === 0) {
-                html += `<p style="color:var(--text-muted);">Категорий пока нет. Администратор может создать первую.</p>`;
-            } else {
-                db.categories.forEach(cat => {
-                    const topics = getTopicsByCategory(cat.id);
-                    html += `<div class="category-card">
-                                <div class="category-header">
-                                    <div class="category-title">${cat.name}</div>
-                                    ${isAdmin(currentUser) ? `<button class="btn-action danger" data-action="delete-category" data-cat-id="${cat.id}" style="font-size:0.8rem; padding:0.2rem 1rem;">Удалить</button>` : ''}
-                                </div>
-                                <div class="category-meta">Создал: ${getAuthorName(cat.createdBy)}</div>
-                                <div class="topic-list">
-                                    ${topics.length === 0 ? '<div class="no-topics">Тем нет</div>' :
-                                        topics.map(t => `
-                                            <div class="topic-item" data-topic-id="${t.id}">
-                                                <span class="topic-name">${t.title}</span>
-                                                <span class="topic-author">${getAuthorName(t.author)}</span>
-                                                <span>
-                                                    ${isAdmin(currentUser) ? `<button class="topic-edit" data-action="edit-topic" data-topic-id="${t.id}">✎</button>` : ''}
-                                                    ${isAdmin(currentUser) ? `<button class="topic-delete" data-action="delete-topic" data-topic-id="${t.id}">✕</button>` : ''}
-                                                </span>
-                                            </div>
-                                        `).join('')
-                                    }
-                                </div>
-                            </div>`;
-                });
-            }
-            html += '</div>';
-            body.innerHTML = html;
-
-            document.querySelectorAll('.topic-item').forEach(el => {
-                el.addEventListener('click', function(e) {
-                    if (e.target.closest('button')) return;
-                    const topicId = parseInt(this.dataset.topicId);
-                    showTopic(topicId);
-                });
-            });
-
-            document.querySelectorAll('[data-action="delete-topic"]').forEach(el => {
-                el.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const topicId = parseInt(this.dataset.topicId);
-                    if (confirm('Удалить тему?')) {
-                        deleteTopic(topicId);
-                    }
-                });
-            });
-
-            document.querySelectorAll('[data-action="edit-topic"]').forEach(el => {
-                el.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const topicId = parseInt(this.dataset.topicId);
-                    openEditTopic(topicId);
-                });
-            });
-
-            document.querySelectorAll('[data-action="delete-category"]').forEach(el => {
-                el.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const catId = parseInt(this.dataset.catId);
-                    if (confirm('Удалить категорию вместе со всеми темами и комментариями?')) {
-                        deleteCategory(catId);
-                    }
-                });
-            });
-        }
-
-        // ============================================================
-        //  ПОКАЗ ТЕМЫ С КОММЕНТАРИЯМИ
-        // ============================================================
-        function showTopic(topicId) {
-            const topic = getTopic(topicId);
-            if (!topic) return;
-            const category = getCategory(topic.categoryId);
-            let comments = getCommentsByTopic(topicId);
-
-            const pinnedComments = comments.filter(c => c.pinned).sort((a,b) => a.createdAt - b.createdAt);
-            const unpinnedComments = comments.filter(c => !c.pinned).sort((a,b) => b.createdAt - a.createdAt);
-            const sortedComments = [...pinnedComments, ...unpinnedComments];
-
-            let html = `
-                <div style="margin-bottom:1.5rem;">
-                    <button class="btn-action" onclick="renderForum()">← Назад к категориям</button>
-                    ${isAdmin(currentUser) ? `<button class="btn-action" onclick="openEditTopic(${topicId})" style="margin-left:0.5rem;">✎ Редактировать тему</button>` : ''}
-                </div>
-                <h2 style="font-size:2rem; margin-bottom:0.3rem;">${topic.title}</h2>
-                <div style="color:var(--text-muted); margin-bottom:1rem;">
-                    Категория: ${category ? category.name : 'Удалена'} &bull; Автор: ${getAuthorName(topic.author)}
-                </div>
-                <div class="comment-section">
-                    ${sortedComments.length === 0 ? '<div style="color:var(--text-muted);">Комментариев пока нет.</div>' :
-                        sortedComments.map(c => {
-                            const isPinned = c.pinned || false;
-                            const pinnedClass = isPinned ? 'pinned' : '';
-                            const pinnedBadge = isPinned ? '<span class="pinned-badge">📌 Закреплено</span>' : '';
-                            const formattedText = formatCommentText(c.text);
-                            return `
-                                <div class="comment ${pinnedClass}" data-comment-id="${c.id}">
-                                    <div class="comment-header">
-                                        <span class="comment-author">${getAuthorName(c.author)}</span>
-                                        <span class="comment-rank">[${getAuthorRank(c.author)}]</span>
-                                        <span class="comment-date">${new Date(c.createdAt).toLocaleString('ru-RU')}</span>
-                                        ${pinnedBadge}
-                                    </div>
-                                    <div class="comment-text">${formattedText}</div>
-                                    <div class="comment-actions">
-                                        ${currentUser ? `<button class="reply-btn" data-author="${getAuthorName(c.author)}">Ответить</button>` : ''}
-                                        ${isAdmin(currentUser) ? `<button class="delete-btn" data-comment-id="${c.id}">Удалить</button>` : ''}
-                                        ${isAdmin(currentUser) ? (isPinned ?
-                                            `<button class="pin-btn" data-comment-id="${c.id}" data-action="unpin">Открепить</button>` :
-                                            `<button class="pin-btn" data-comment-id="${c.id}" data-action="pin">Закрепить</button>`
-                                        ) : ''}
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')
-                    }
-                </div>
-            `;
-
-            if (currentUser) {
-                html += `
-                    <div class="comment-form">
-                        <div class="toolbar">
-                            <button data-format="bold" title="Жирный (выделите текст)">B</button>
-                            <button data-format="italic" title="Курсив (выделите текст)"><em>I</em></button>
-                            <select data-format="color" title="Цвет текста">
-                                <option value="">Цвет</option>
-                                <option value="red">🔴 Красный</option>
-                                <option value="orange">🟠 Оранжевый</option>
-                                <option value="gold">🟡 Золотой</option>
-                                <option value="green">🟢 Зелёный</option>
-                                <option value="cyan">🔵 Голубой</option>
-                                <option value="blue">🔵 Синий</option>
-                                <option value="purple">🟣 Фиолетовый</option>
-                                <option value="pink">🩷 Розовый</option>
-                                <option value="white">⬜ Белый</option>
-                            </select>
-                        </div>
-                        <div class="input-row">
-                            <input type="text" id="comment-input" placeholder="Ваш комментарий..." />
-                            <button class="btn-action primary" id="send-comment">Отправить</button>
-                        </div>
-                    </div>
-                `;
-            } else {
-                html += `<div style="color:var(--text-muted); margin-top:1rem;">Чтобы писать комментарии, <a href="#" onclick="openLogin()" style="color:var(--red-accent);">войдите</a> или <a href="#" onclick="openRegister()" style="color:var(--red-accent);">зарегистрируйтесь</a>.</div>`;
-            }
-
-            document.getElementById('forum-body').innerHTML = html;
-
-            document.querySelectorAll('[data-format]').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    const input = document.getElementById('comment-input');
-                    if (!input) return;
-                    const start = input.selectionStart;
-                    const end = input.selectionEnd;
-                    const selected = input.value.substring(start, end);
-                    const format = this.dataset.format;
-                    let replacement = '';
-                    if (format === 'bold') {
-                        replacement = `**${selected}**`;
-                    } else if (format === 'italic') {
-                        replacement = `*${selected}*`;
-                    } else if (format === 'color') {
-                        const color = this.value;
-                        if (!color) return;
-                        replacement = `[color=${color}]${selected}[/color]`;
-                    }
-                    if (replacement) {
-                        input.value = input.value.substring(0, start) + replacement + input.value.substring(end);
-                        input.focus();
-                        input.selectionStart = start + replacement.length;
-                        input.selectionEnd = start + replacement.length;
-                    }
-                });
-            });
-            const colorSelect = document.querySelector('[data-format="color"]');
-            if (colorSelect) {
-                colorSelect.addEventListener('change', function() {
-                    const input = document.getElementById('comment-input');
-                    if (!input) return;
-                    const start = input.selectionStart;
-                    const end = input.selectionEnd;
-                    const selected = input.value.substring(start, end);
-                    const color = this.value;
-                    if (!color) return;
-                    const replacement = `[color=${color}]${selected}[/color]`;
-                    if (replacement) {
-                        input.value = input.value.substring(0, start) + replacement + input.value.substring(end);
-                        input.focus();
-                        input.selectionStart = start + replacement.length;
-                        input.selectionEnd = start + replacement.length;
-                    }
-                    this.value = '';
-                });
-            }
-
-            const sendBtn = document.getElementById('send-comment');
-            if (sendBtn) {
-                sendBtn.addEventListener('click', function() {
-                    const input = document.getElementById('comment-input');
-                    const text = input.value.trim();
-                    if (!text) return alert('Введите текст');
-                    if (!currentUser) return alert('Вы не авторизованы');
-                    const newComment = {
-                        id: generateId('comments'),
-                        topicId: topicId,
-                        author: currentUser.id,
-                        text: text,
-                        createdAt: Date.now(),
-                        pinned: false
-                    };
-                    db.comments.push(newComment);
-                    saveDB(db);
-                    showTopic(topicId);
-                });
-            }
-            const commentInput = document.getElementById('comment-input');
-            if (commentInput) {
-                commentInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        document.getElementById('send-comment')?.click();
-                    }
-                });
-            }
-
-            document.querySelectorAll('.reply-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const author = this.dataset.author;
-                    const input = document.getElementById('comment-input');
-                    if (input) {
-                        input.value = `@${author}, ` + input.value;
-                        input.focus();
-                    }
-                });
-            });
-
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const commentId = parseInt(this.dataset.commentId);
-                    if (confirm('Удалить комментарий?')) {
-                        db.comments = db.comments.filter(c => c.id !== commentId);
-                        saveDB(db);
-                        showTopic(topicId);
-                    }
-                });
-            });
-
-            document.querySelectorAll('.pin-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const commentId = parseInt(this.dataset.commentId);
-                    const action = this.dataset.action;
-                    const comment = db.comments.find(c => c.id === commentId);
-                    if (!comment) return;
-                    if (action === 'pin') {
-                        db.comments.forEach(c => {
-                            if (c.topicId === comment.topicId) c.pinned = false;
-                        });
-                        comment.pinned = true;
-                    } else {
-                        comment.pinned = false;
-                    }
-                    saveDB(db);
-                    showTopic(topicId);
-                });
-            });
-        }
-
-        // ============================================================
-        //  ОСТАЛЬНЫЕ ФУНКЦИИ
-        // ============================================================
-        function deleteTopic(topicId) {
-            db.topics = db.topics.filter(t => t.id !== topicId);
-            db.comments = db.comments.filter(c => c.topicId !== topicId);
-            saveDB(db);
-            renderForum();
-        }
-
-        function deleteCategory(catId) {
-            const topicsToRemove = db.topics.filter(t => t.categoryId === catId);
-            const topicIds = topicsToRemove.map(t => t.id);
-            db.topics = db.topics.filter(t => t.categoryId !== catId);
-            db.comments = db.comments.filter(c => !topicIds.includes(c.topicId));
-            db.categories = db.categories.filter(c => c.id !== catId);
-            saveDB(db);
-            renderForum();
-        }
-
-        function openEditTopic(topicId) {
-            const topic = getTopic(topicId);
-            if (!topic) return;
-            openModal(`
-                <h2>Редактировать тему</h2>
-                <label>Новый заголовок</label>
-                <input type="text" id="edit-title" value="${topic.title}" />
-                <div class="modal-actions">
-                    <button class="btn-action cancel" onclick="closeModal()">Отмена</button>
-                    <button class="btn-action primary" id="save-edit-topic">Сохранить</button>
-                </div>
-            `);
-            document.getElementById('save-edit-topic').addEventListener('click', function() {
-                const newTitle = document.getElementById('edit-title').value.trim();
-                if (!newTitle) return alert('Введите заголовок');
-                const topic = getTopic(topicId);
-                if (topic) {
-                    topic.title = newTitle;
-                    saveDB(db);
-                    closeModal();
-                    renderForum();
-                }
-            });
-        }
-
-        function handleAction(e) {
-            const action = this.dataset.action;
-            switch(action) {
-                case 'add-category': openAddCategory(); break;
-                case 'add-topic': openAddTopic(); break;
-                case 'login': openLogin(); break;
-                case 'register': openRegister(); break;
-                default: break;
-            }
-        }
-
         function openModal(html) {
             const modal = document.getElementById('modal');
             document.getElementById('modal-content').innerHTML = html;
@@ -917,66 +369,8 @@
             document.getElementById('modal').classList.remove('open');
         }
 
-        function openAddCategory() {
-            if (!isAdmin(currentUser)) return alert('Доступно только ГА Форума');
-            openModal(`
-                <h2>Создать категорию</h2>
-                <label>Название категории</label>
-                <input type="text" id="cat-name" placeholder="Например: Игровые новости" />
-                <div class="modal-actions">
-                    <button class="btn-action cancel" onclick="closeModal()">Отмена</button>
-                    <button class="btn-action primary" id="save-category">Создать</button>
-                </div>
-            `);
-            document.getElementById('save-category').addEventListener('click', function() {
-                const name = document.getElementById('cat-name').value.trim();
-                if (!name) return alert('Введите название');
-                const newCat = {
-                    id: generateId('categories'),
-                    name: name,
-                    createdBy: currentUser.id
-                };
-                db.categories.push(newCat);
-                saveDB(db);
-                closeModal();
-                renderForum();
-            });
-        }
-
-        function openAddTopic() {
-            if (!isAdmin(currentUser)) return alert('Доступно только ГА Форума');
-            const catOptions = db.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-            openModal(`
-                <h2>Создать тему</h2>
-                <label>Категория</label>
-                <select id="topic-category">${catOptions}</select>
-                <label>Заголовок темы</label>
-                <input type="text" id="topic-title" placeholder="Заголовок" />
-                <div class="modal-actions">
-                    <button class="btn-action cancel" onclick="closeModal()">Отмена</button>
-                    <button class="btn-action primary" id="save-topic">Создать</button>
-                </div>
-            `);
-            document.getElementById('save-topic').addEventListener('click', function() {
-                const categoryId = parseInt(document.getElementById('topic-category').value);
-                const title = document.getElementById('topic-title').value.trim();
-                if (!title) return alert('Введите заголовок');
-                const newTopic = {
-                    id: generateId('topics'),
-                    categoryId: categoryId,
-                    title: title,
-                    author: currentUser.id,
-                    createdAt: Date.now()
-                };
-                db.topics.push(newTopic);
-                saveDB(db);
-                closeModal();
-                renderForum();
-            });
-        }
-
         // ============================================================
-        //  ВХОД (без подсказок и сброса)
+        //  ВХОД
         // ============================================================
         function openLogin() {
             openModal(`
@@ -1001,7 +395,6 @@
                 currentUser = user;
                 closeModal();
                 updateUI();
-                renderForum();
             });
         }
 
@@ -1011,15 +404,15 @@
         function openRegister() {
             openModal(`
                 <h2>Регистрация</h2>
-                <label>Ник (отображается на форуме)</label>
+                <label>Ник</label>
                 <input type="text" id="reg-username" placeholder="Ваш ник" />
                 <div id="username-error" class="error-msg" style="display:none;">Уже занято!</div>
-                <label>Логин (для входа)</label>
+                <label>Логин</label>
                 <input type="text" id="reg-login" placeholder="Логин" />
                 <div id="login-error" class="error-msg" style="display:none;">Уже занято!</div>
                 <label>Пароль</label>
                 <input type="password" id="reg-password" placeholder="Пароль" />
-                <label>Ранг (выберите)</label>
+                <label>Ранг</label>
                 <select id="reg-rank">
                     <option value="Новичок">Новичок</option>
                     <option value="Посетитель">Посетитель</option>
@@ -1077,7 +470,7 @@
                 }
 
                 const newUser = {
-                    id: generateId('users'),
+                    id: db.nextId.users++,
                     username: username,
                     login: login,
                     password: password,
@@ -1090,7 +483,6 @@
                 currentUser = newUser;
                 closeModal();
                 updateUI();
-                renderForum();
                 alert('Регистрация успешна! Вы вошли как ' + username);
             });
         }
@@ -1259,12 +651,9 @@
             if (currentUser.rank === 'ГА Форума') return;
             if (!confirm('Вы уверены, что хотите удалить аккаунт? Это действие необратимо.')) return;
             db.users = db.users.filter(u => u.id !== currentUser.id);
-            db.comments = db.comments.filter(c => c.author !== currentUser.id);
-            db.topics = db.topics.filter(t => t.author !== currentUser.id);
             saveDB(db);
             currentUser = null;
             updateUI();
-            renderForum();
             document.querySelector('[data-tab="install"]').click();
             alert('Аккаунт удалён.');
         }
@@ -1288,6 +677,7 @@
                 `;
             }
 
+            // Навигация: добавляем/убираем вкладку "Профиль"
             const navTabs = document.getElementById('nav-tabs');
             let profileTab = navTabs.querySelector('[data-tab="profile"]');
             if (currentUser) {
@@ -1296,19 +686,18 @@
                     btn.className = 'nav-tab';
                     btn.dataset.tab = 'profile';
                     btn.textContent = 'Профиль';
-                    const forumTab = navTabs.querySelector('[data-tab="forum"]');
-                    if (forumTab) {
-                        navTabs.insertBefore(btn, forumTab.nextSibling);
+                    const installTab = navTabs.querySelector('[data-tab="install"]');
+                    if (installTab) {
+                        navTabs.insertBefore(btn, installTab.nextSibling);
                     } else {
                         navTabs.appendChild(btn);
                     }
                     btn.addEventListener('click', function() {
-                        const target = this.dataset.tab;
                         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
                         this.classList.add('active');
                         document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-                        document.getElementById(target + '-content').classList.add('active');
-                        if (target === 'profile') renderProfile();
+                        document.getElementById('profile-content').classList.add('active');
+                        renderProfile();
                     });
                 }
             } else {
@@ -1321,29 +710,19 @@
         function logout() {
             currentUser = null;
             updateUI();
-            renderForum();
             document.querySelector('[data-tab="install"]').click();
         }
 
         // ============================================================
         //  ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
         // ============================================================
-        const tabs = document.querySelectorAll('.nav-tab');
-        const sections = {
-            install: document.getElementById('install-content'),
-            forum: document.getElementById('forum-content'),
-            profile: document.getElementById('profile-content')
-        };
-
         document.querySelectorAll('.nav-tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 const target = this.dataset.tab;
                 document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
-                Object.values(sections).forEach(s => s.classList.remove('active'));
-                if (sections[target]) sections[target].classList.add('active');
-
-                if (target === 'forum') renderForum();
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                document.getElementById(target + '-content').classList.add('active');
                 if (target === 'profile') renderProfile();
             });
         });
